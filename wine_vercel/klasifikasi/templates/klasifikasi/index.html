@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Klasifikasi Wine</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 760px; margin: auto; padding: 16px; }
+    .isian { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+    label, input { display: block; width: 100%; box-sizing: border-box; }
+    input { padding: 8px; }
+    button { margin-top: 16px; padding: 10px 24px; }
+    .hasil { background: #e6f4ea; padding: 12px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    .errorlist { color: #b00020; }
+  </style>
+</head>
+<body>
+  <h1>Klasifikasi Wine</h1>
+  <p>Menebak kelas kultivar anggur dari hasil uji kimia dengan Decision Tree.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="isian">
+      {% for field in form %}
+        <div>{{ field.label_tag }} {{ field }} {{ field.errors }}</div>
+      {% endfor %}
+    </div>
+    <button type="submit">Prediksi</button>
+  </form>
+
+  {% if hasil %}
+    <h2 class="hasil">Hasil prediksi: Kelas {{ hasil }}</h2>
+    <p>Proporsi tiap kelas pada daun pohon keputusan:</p>
+    <table>
+      <tr><th>Kelas</th><th>Proporsi</th></tr>
+      {% for kelas, nilai in proporsi %}
+        <tr><td>{{ kelas }}</td><td>{{ nilai }}</td></tr>
+      {% endfor %}
+    </table>
+  {% endif %}
+
+  <h2>Evaluasi model (data uji)</h2>
+  <p>Akurasi: <strong>{{ akurasi }}</strong></p>
+  <p>Confusion matrix (baris = asli, kolom = prediksi)</p>
+  <table>
+    <tr><th></th><th>Kelas 1</th><th>Kelas 2</th><th>Kelas 3</th></tr>
+    {% for kelas, baris in matriks %}
+      <tr><th>Kelas {{ kelas }}</th>{% for n in baris %}<td>{{ n }}</td>{% endfor %}</tr>
+    {% endfor %}
+  </table>
+</body>
+</html>
